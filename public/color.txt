@@ -1,0 +1,4 @@
+header: #2C4E71
+bar1: #B7CD7A
+bar2: #FBF26E
+chart: #D4E4F2
