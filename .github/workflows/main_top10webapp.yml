@@ -1,4 +1,4 @@
-name: Deploy Next.js (standalone) to Azure Web App - top10webapp
+name: Deploy Next.js to Azure Web App - top10webapp
 
 on:
   push:
@@ -26,35 +26,13 @@ jobs:
         run: npm ci
 
       # 4. 构建 Next.js 应用
-      - name: Build Next.js (standalone)
+      - name: Build Next.js
         run: npm run build
 
-      # 5. 准备部署文件夹（仅包含 standalone 运行需要的内容）
-      - name: Prepare deploy folder
-        run: |
-          rm -rf deploy
-          mkdir -p deploy/.next
-          cp -r .next/standalone/* deploy/
-          cp -r .next/static deploy/.next/static
-          if [ -d public ]; then cp -r public deploy/public; fi
-          # 写入 package.json，保证有 start 脚本和最小依赖
-          cat > deploy/package.json <<'EOF'
-          {
-            "name": "next-standalone",
-            "private": true,
-            "scripts": {
-              "start": "node server.js"
-            },
-            "dependencies": {
-              "next": "15.5.2"
-            }
-          }
-          EOF
-
-      # 6. 部署到 Azure Web App
+      # 5. 部署到 Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: "top10webapp" # 替换为你的 Web App 名称
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: ./deploy
+          package: .
