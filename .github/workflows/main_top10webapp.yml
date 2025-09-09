@@ -30,13 +30,9 @@ jobs:
         run: |
           rm -rf deploy
           mkdir -p deploy/.next
-          # 拷贝最小运行包（含必要 node_modules 与 server.js）
           cp -r .next/standalone/* deploy/
-          # 拷贝静态资源
           cp -r .next/static deploy/.next/static
-          # 如有 public 目录，一并带上（可选）
           if [ -d public ]; then cp -r public deploy/public; fi
-          # 写入最小 package.json，Azure 将执行 npm start 启动 server.js
           cat > deploy/package.json <<'EOF'
           {
             "name": "next-standalone",
@@ -51,5 +47,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'top10webapp'   # 替换为你的 Web App 名称
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }} # 用你的 Secret 名称
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: ./deploy
