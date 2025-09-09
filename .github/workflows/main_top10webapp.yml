@@ -29,10 +29,20 @@ jobs:
       - name: Build Next.js
         run: npm run build
 
-      # 5. 部署到 Azure Web App
+      # 5. 打包构建产物（包含 node_modules 和 .next）
+      - name: Archive build
+        run: |
+          tar -czf release.tar.gz \
+            .next \
+            node_modules \
+            public \
+            package.json \
+            package-lock.json
+
+      # 6. 部署到 Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: "top10webapp" # 替换为你的 Web App 名称
+          app-name: "top10webapp"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: .
+          package: release.tar.gz
