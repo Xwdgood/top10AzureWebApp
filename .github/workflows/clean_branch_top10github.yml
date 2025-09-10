@@ -37,9 +37,16 @@ jobs:
           # Copy standalone build output
           cp -r .next/standalone/* deploy/
           
-          # Copy static files
-          cp -r .next/static deploy/.next/static
-          cp -r public deploy/public
+          # Copy static files if they exist
+          if [ -d ".next/static" ]; then
+            mkdir -p deploy/.next
+            cp -r .next/static deploy/.next/static
+          fi
+          
+          # Copy public directory if it exists
+          if [ -d "public" ]; then
+            cp -r public deploy/public
+          fi
           
           # Copy package.json for Azure to understand the project
           cp package.json deploy/
@@ -47,6 +54,10 @@ jobs:
           # Create startup script for Azure
           echo "node server.js" > deploy/startup.sh
           chmod +x deploy/startup.sh
+          
+          # Debug: List what was copied
+          echo "Contents of deploy directory:"
+          ls -la deploy/
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
