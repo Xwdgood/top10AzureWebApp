@@ -29,11 +29,30 @@ jobs:
           npm run build --if-present
           npm run test --if-present
 
+      - name: Prepare deployment package
+        run: |
+          # Create deployment directory
+          mkdir -p deploy
+          
+          # Copy standalone build output
+          cp -r .next/standalone/* deploy/
+          
+          # Copy static files
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+          
+          # Copy package.json for Azure to understand the project
+          cp package.json deploy/
+          
+          # Create startup script for Azure
+          echo "node server.js" > deploy/startup.sh
+          chmod +x deploy/startup.sh
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: deploy
 
   deploy:
     runs-on: ubuntu-latest
