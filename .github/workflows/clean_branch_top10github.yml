@@ -48,8 +48,12 @@ jobs:
             cp -r public deploy/public
           fi
           
-          # Copy package.json for Azure to understand the project
+          # Copy package.json for Azure to understand the project  
           cp package.json deploy/
+          
+          # Verify package.json content
+          echo "Checking package.json start script:"
+          grep '"start":' deploy/package.json
           
           # Create startup script for Azure
           echo "node server.js" > deploy/startup.sh
