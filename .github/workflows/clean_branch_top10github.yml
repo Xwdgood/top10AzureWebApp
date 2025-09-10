@@ -34,8 +34,20 @@ jobs:
           # Create deployment directory
           mkdir -p deploy
           
+          # First, let's see what was built
+          echo "Build output structure:"
+          ls -la .next/
+          echo "Standalone directory:"
+          ls -la .next/standalone/ || echo "No standalone directory found"
+          
           # Copy standalone build output
-          cp -r .next/standalone/* deploy/
+          if [ -d ".next/standalone" ]; then
+            cp -r .next/standalone/* deploy/
+          else
+            echo "No standalone build found, copying full .next directory"
+            mkdir -p deploy
+            cp -r .next deploy/.next
+          fi
           
           # Copy static files if they exist
           if [ -d ".next/static" ]; then
@@ -55,13 +67,11 @@ jobs:
           echo "Checking package.json start script:"
           grep '"start":' deploy/package.json
           
-          # Create startup script for Azure
-          echo "node server.js" > deploy/startup.sh
-          chmod +x deploy/startup.sh
-          
           # Debug: List what was copied
           echo "Contents of deploy directory:"
           ls -la deploy/
+          echo "Contents of deploy/.next (if exists):"
+          ls -la deploy/.next/ || echo "No .next directory in deploy"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
